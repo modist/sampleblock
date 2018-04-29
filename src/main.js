@@ -21,7 +21,6 @@ function debounce (func, wait, immediate) {
 }
 
 function paintSettings () {
-	document.getElementById('text-input-id-0').value = mapsKey;
 	document.getElementById('text-input-id-1').value = address;
 	document.getElementById('slider-id-01').value = width;
 	document.getElementById('slider-id-02').value = height;
@@ -35,7 +34,6 @@ function paintSliderValues () {
 }
 
 function paintMap() {
-	mapsKey = document.getElementById('text-input-id-0').value;
 	address = document.getElementById('text-input-id-1').value;
 	width = document.getElementById('slider-id-01').value;
 	height = document.getElementById('slider-id-02').value;
@@ -46,7 +44,7 @@ function paintMap() {
 	}
 	var url = 'https://maps.googleapis.com/maps/api/staticmap?center=' +
 		address.split(' ').join('+') + '&size=' + width + 'x' + height + '&zoom=' + zoom +
-		'&markers=' + address.split(' ').join('+') + '&key=' + mapsKey;
+		'&markers=' + address.split(' ').join('+') + '&key=AIzaSyBViM0Y8LdxJYXWpyImtsXQBPi63n0ocfQ';
 	sdk.setContent('<a href="' + link + '"><img src="' + url + '" /></a>');
 	sdk.setData({
 		address: address,
@@ -65,7 +63,6 @@ sdk.getData(function (data) {
 	height = data.height || 300;
 	zoom = data.zoom || 15;
 	link = data.link || '';
-	mapsKey = data.mapsKey || localStorage.getItem('googlemapsapikeyforblock');
 	paintSettings();
 	paintSliderValues();
 	paintMap();
