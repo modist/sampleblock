@@ -54,7 +54,6 @@ function paintMap() {
 		link: link,
 		mapsKey: mapsKey
 	});
-	localStorage.setItem('googlemapsapikeyforblock', mapsKey);
 }
 
 sdk.getData(function (data) {
