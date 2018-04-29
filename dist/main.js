@@ -90,7 +90,6 @@ function debounce (func, wait, immediate) {
 }
 
 function paintSettings () {
-	document.getElementById('text-input-id-0').value = mapsKey;
 	document.getElementById('text-input-id-1').value = address;
 	document.getElementById('slider-id-01').value = width;
 	document.getElementById('slider-id-02').value = height;
@@ -104,7 +103,6 @@ function paintSliderValues () {
 }
 
 function paintMap() {
-	mapsKey = document.getElementById('text-input-id-0').value;
 	address = document.getElementById('text-input-id-1').value;
 	width = document.getElementById('slider-id-01').value;
 	height = document.getElementById('slider-id-02').value;
@@ -115,7 +113,7 @@ function paintMap() {
 	}
 	var url = 'https://maps.googleapis.com/maps/api/staticmap?center=' +
 		address.split(' ').join('+') + '&size=' + width + 'x' + height + '&zoom=' + zoom +
-		'&markers=' + address.split(' ').join('+') + '&key=' + mapsKey;
+		'&markers=' + address.split(' ').join('+') + '&key=AIzaSyBViM0Y8LdxJYXWpyImtsXQBPi63n0ocfQ';
 	sdk.setContent('<a href="' + link + '"><img src="' + url + '" /></a>');
 	sdk.setData({
 		address: address,
@@ -125,7 +123,6 @@ function paintMap() {
 		link: link,
 		mapsKey: mapsKey
 	});
-	localStorage.setItem('googlemapsapikeyforblock', mapsKey);
 }
 
 sdk.getData(function (data) {
@@ -134,7 +131,6 @@ sdk.getData(function (data) {
 	height = data.height || 300;
 	zoom = data.zoom || 15;
 	link = data.link || '';
-	mapsKey = data.mapsKey || localStorage.getItem('googlemapsapikeyforblock');
 	paintSettings();
 	paintSliderValues();
 	paintMap();
@@ -792,20 +788,17 @@ var SDK = function (whitelistOverride, sslOverride) {
 	// the custom block should verify it is being called from
 	// the marketing cloud
 	this._validateOrigin = function (origin) {
-		var whiteterm;
-		var whitelist = whitelistOverride || ['marketingcloudapps.com'];
-		if (sslOverride || origin.indexOf('https://') === 0) {
-			if (origin === 'https://blocktester.herokuapp.com') {
+		// Make sure to escape periods since these strings are used in a regular expression
+		var allowedDomains = whitelistOverride || ['marketingcloudapps\\.com', 'blocktester\\.herokuapp\\.com'];
+		for (var i = 0; i < allowedDomains.length; i++) {
+			// Makes the s optional in https
+			var optionalSsl = sslOverride ? '?' : '';
+			var whitelistRegex = new RegExp('^https' + optionalSsl + '://([a-zA-Z0-9-]+\\.)*' + allowedDomains[i] + '(:[0-9]+)?$', 'i');
+			if (whitelistRegex.test(origin)) {
 				return true;
 			}
-			for (var key in whitelist) {
-				whiteterm = whitelist[key];
-				checkWhite = origin.replace(sslOverride && 'http://' || 'https://', '').split('/')[0].split(':')[0];
-				if (checkWhite.indexOf(whiteterm) === checkWhite.length - whiteterm.length) {
-					return true;
-				}
-			}
 		}
+
 		return false;
 	};
 
